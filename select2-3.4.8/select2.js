@@ -179,12 +179,12 @@ the specific language governing permissions and limitations under the Apache Lic
 
     function installKeyUpChangeEvent(element) {
         var key="keyup-change-value";
-        element.on("keydown", function () {
+        element.bind("keydown", function () {
             if ($.data(element, key) === undefined) {
                 $.data(element, key, element.val());
             }
         });
-        element.on("keyup", function () {
+        element.bind("keyup", function () {
             var val= $.data(element, key);
             if (val !== undefined && element.val() !== val) {
                 $.removeData(element, key);
@@ -193,7 +193,7 @@ the specific language governing permissions and limitations under the Apache Lic
         });
     }
 
-    $document.on("mousemove", function (e) {
+    $document.bind("mousemove", function (e) {
         lastMousePosition.x = e.pageX;
         lastMousePosition.y = e.pageY;
     });
@@ -205,7 +205,7 @@ the specific language governing permissions and limitations under the Apache Lic
      * the elements under the pointer are scrolled.
      */
     function installFilteredMouseMove(element) {
-        element.on("mousemove", function (e) {
+        element.bind("mousemove", function (e) {
             var lastpos = lastMousePosition;
             if (lastpos === undefined || lastpos.x !== e.pageX || lastpos.y !== e.pageY) {
                 $(e.target).trigger("mousemove-filtered", e);
@@ -236,7 +236,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
     function installDebouncedScroll(threshold, element) {
         var notify = debounce(threshold, function (e) { element.trigger("scroll-debounced", e);});
-        element.on("scroll", function (e) {
+        element.bind("scroll", function (e) {
             if (indexOf(e.target, element.get()) >= 0) notify(e);
         });
     }
@@ -707,7 +707,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 .data("select2", this)
                 .attr("tabindex", "-1")
                 .before(this.container)
-                .on("click.select2", killEvent); // do not leak click events
+                .bind("click.select2", killEvent); // do not leak click events
 
             this.container.data("select2", this);
 
@@ -717,7 +717,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             this.dropdown.addClass(evaluate(opts.dropdownCssClass));
             this.dropdown.data("select2", this);
-            this.dropdown.on("click", killEvent);
+            this.dropdown.bind("click", killEvent);
 
             this.results = results = this.container.find(resultsSelector);
             this.search = search = this.container.find("input.select2-input");
@@ -729,21 +729,21 @@ the specific language governing permissions and limitations under the Apache Lic
             // initialize the container
             this.initContainer();
 
-            this.container.on("click", killEvent);
+            this.container.bind("click", killEvent);
 
             installFilteredMouseMove(this.results);
 
-            this.dropdown.on("mousemove-filtered", resultsSelector, this.bind(this.highlightUnderEvent));
-            this.dropdown.on("touchstart touchmove touchend", resultsSelector, this.bind(function (event) {
+            this.dropdown.bind("mousemove-filtered", resultsSelector, this.bind(this.highlightUnderEvent));
+            this.dropdown.bind("touchstart touchmove touchend", resultsSelector, this.bind(function (event) {
                 this._touchEvent = true;
                 this.highlightUnderEvent(event);
             }));
-            this.dropdown.on("touchmove", resultsSelector, this.bind(this.touchMoved));
-            this.dropdown.on("touchstart touchend", resultsSelector, this.bind(this.clearTouchMoved));
+            this.dropdown.bind("touchmove", resultsSelector, this.bind(this.touchMoved));
+            this.dropdown.bind("touchstart touchend", resultsSelector, this.bind(this.clearTouchMoved));
 
             // Waiting for a click event on touch devices to select option and hide dropdown
             // otherwise click will be triggered on an underlying element
-            this.dropdown.on('click', this.bind(function (event) {
+            this.dropdown.bind('click', this.bind(function (event) {
                 if (this._touchEvent) {
                     this._touchEvent = false;
                     this.selectHighlighted();
@@ -751,11 +751,11 @@ the specific language governing permissions and limitations under the Apache Lic
             }));
 
             installDebouncedScroll(80, this.results);
-            this.dropdown.on("scroll-debounced", resultsSelector, this.bind(this.loadMoreIfNeeded));
+            this.dropdown.bind("scroll-debounced", resultsSelector, this.bind(this.loadMoreIfNeeded));
 
             // do not propagate change event from the search field out of the component
-            $(this.container).on("change", ".select2-input", function(e) {e.stopPropagation();});
-            $(this.dropdown).on("change", ".select2-input", function(e) {e.stopPropagation();});
+            $(this.container).bind("change", ".select2-input", function(e) {e.stopPropagation();});
+            $(this.dropdown).bind("change", ".select2-input", function(e) {e.stopPropagation();});
 
             // if jquery.mousewheel plugin is installed we can prevent out-of-bounds scrolling of results via mousewheel
             if ($.fn.mousewheel) {
@@ -772,11 +772,11 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             installKeyUpChangeEvent(search);
-            search.on("keyup-change input paste", this.bind(this.updateResults));
-            search.on("focus", function () { search.addClass("select2-focused"); });
-            search.on("blur", function () { search.removeClass("select2-focused");});
+            search.bind("keyup-change input paste", this.bind(this.updateResults));
+            search.bind("focus", function () { search.addClass("select2-focused"); });
+            search.bind("blur", function () { search.removeClass("select2-focused");});
 
-            this.dropdown.on("mouseup", resultsSelector, this.bind(function (e) {
+            this.dropdown.bind("mouseup", resultsSelector, this.bind(function (e) {
                 if ($(e.target).closest(".select2-result-selectable").length > 0) {
                     this.highlightUnderEvent(e);
                     this.selectHighlighted(e);
@@ -787,7 +787,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // for mouse events outside of itself so it can close itself. since the dropdown is now outside the select2's
             // dom it will trigger the popup close, which is not what we want
             // focusin can cause focus wars between modals and select2 since the dropdown is outside the modal.
-            this.dropdown.on("click mouseup mousedown touchstart touchend focusin", function (e) { e.stopPropagation(); });
+            this.dropdown.bind("click mouseup mousedown touchstart touchend focusin", function (e) { e.stopPropagation(); });
 
             this.nextSearchTerm = undefined;
 
@@ -804,19 +804,19 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.search.attr("maxlength", opts.maximumInputLength);
             }
 
-            var disabled = opts.element.prop("disabled");
+            var disabled = opts.element.attr("disabled");
             if (disabled === undefined) disabled = false;
             this.enable(!disabled);
 
-            var readonly = opts.element.prop("readonly");
+            var readonly = opts.element.attr("readonly");
             if (readonly === undefined) readonly = false;
             this.readonly(readonly);
 
             // Calculate size of scrollbar
             scrollBarDimensions = scrollBarDimensions || measureScrollbar();
 
-            this.autofocus = opts.element.prop("autofocus");
-            opts.element.prop("autofocus", false);
+            this.autofocus = opts.element.attr("autofocus");
+            opts.element.attr("autofocus", false);
             if (this.autofocus) this.focus();
 
             this.search.attr("placeholder", opts.searchInputPlaceholder);
@@ -840,8 +840,8 @@ the specific language governing permissions and limitations under the Apache Lic
                 element
                     .removeClass("select2-offscreen")
                     .removeData("select2")
-                    .off(".select2")
-                    .prop("autofocus", this.autofocus || false);
+                    .unbind(".select2")
+                    .attr("autofocus", this.autofocus || false);
                 if (this.elementTabIndex) {
                     element.attr({tabindex: this.elementTabIndex});
                 } else {
@@ -863,11 +863,11 @@ the specific language governing permissions and limitations under the Apache Lic
         optionToData: function(element) {
             if (element.is("option")) {
                 return {
-                    id:element.prop("value"),
+                    id:element.attr("value"),
                     text:element.text(),
                     element: element.get(),
                     css: element.attr("class"),
-                    disabled: element.prop("disabled"),
+                    disabled: element.attr("disabled"),
                     locked: equal(element.attr("locked"), "locked") || equal(element.data("locked"), true)
                 };
             } else if (element.is("optgroup")) {
@@ -1064,7 +1064,7 @@ the specific language governing permissions and limitations under the Apache Lic
         monitorSource: function () {
             var el = this.opts.element, sync, observer;
 
-            el.on("change.select2", this.bind(function (e) {
+            el.bind("change.select2", this.bind(function (e) {
                 if (this.opts.element.data("select2-change-triggered") !== true) {
                     this.initSelection();
                 }
@@ -1073,11 +1073,11 @@ the specific language governing permissions and limitations under the Apache Lic
             sync = this.bind(function () {
 
                 // sync enabled state
-                var disabled = el.prop("disabled");
+                var disabled = el.attr("disabled");
                 if (disabled === undefined) disabled = false;
                 this.enable(!disabled);
 
-                var readonly = el.prop("readonly");
+                var readonly = el.attr("readonly");
                 if (readonly === undefined) readonly = false;
                 this.readonly(readonly);
 
@@ -1095,7 +1095,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     this.attachEvent("onpropertychange", sync);
                 });
             }
-            
+
             // safari, chrome, firefox, IE11
             observer = window.MutationObserver || window.WebKitMutationObserver|| window.MozMutationObserver;
             if (observer !== undefined) {
@@ -1163,7 +1163,7 @@ the specific language governing permissions and limitations under the Apache Lic
             if (this._enabled === enabled) return;
             this._enabled = enabled;
 
-            this.opts.element.prop("disabled", !enabled);
+            this.opts.element.attr("disabled", !enabled);
             this.enableInterface();
         },
 
@@ -1178,7 +1178,7 @@ the specific language governing permissions and limitations under the Apache Lic
             if (this._readonly === enabled) return;
             this._readonly = enabled;
 
-            this.opts.element.prop("readonly", enabled);
+            this.opts.element.attr("readonly", enabled);
             this.enableInterface();
         },
 
@@ -1358,7 +1358,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 mask.attr("id","select2-drop-mask").attr("class","select2-drop-mask");
                 mask.hide();
                 mask.appendTo(this.body);
-                mask.on("mousedown touchstart click", function (e) {
+                mask.bind("mousedown touchstart click", function (e) {
                     // Prevent IE from generating a click event on the body
                     reinsertElement(mask);
 
@@ -1397,7 +1397,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // the position of the dropdown to be updated as well so it does not come unglued from the container
             var that = this;
             this.container.parents().add(window).each(function () {
-                $(this).on(resize+" "+scroll+" "+orient, function (e) {
+                $(this).bind(resize+" "+scroll+" "+orient, function (e) {
                     if (that.opened()) that.positionDropdown();
                 });
             });
@@ -1415,7 +1415,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 orient = "orientationchange."+cid;
 
             // unbind event listeners
-            this.container.parents().add(window).each(function () { $(this).off(scroll).off(resize).off(orient); });
+            this.container.parents().add(window).each(function () { $(this).unbind(scroll).unbind(resize).unbind(orient); });
 
             this.clearDropdownAlignmentPreference();
 
@@ -1919,7 +1919,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         enableInterface: function() {
             if (this.parent.enableInterface.apply(this, arguments)) {
-                this.focusser.prop("disabled", !this.isInterfaceEnabled());
+                this.focusser.attr("disabled", !this.isInterfaceEnabled());
             }
         },
 
@@ -1963,7 +1963,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }
 
-            this.focusser.prop("disabled", true).val("");
+            this.focusser.attr("disabled", true).val("");
             this.updateResults(true);
             this.opts.element.trigger($.Event("select2-open"));
         },
@@ -1973,7 +1973,7 @@ the specific language governing permissions and limitations under the Apache Lic
             if (!this.opened()) return;
             this.parent.close.apply(this, arguments);
 
-            this.focusser.prop("disabled", false);
+            this.focusser.attr("disabled", false);
 
             if (this.opts.shouldFocusInput(this)) {
                 this.focusser.focus();
@@ -1985,7 +1985,7 @@ the specific language governing permissions and limitations under the Apache Lic
             if (this.opened()) {
                 this.close();
             } else {
-                this.focusser.prop("disabled", false);
+                this.focusser.attr("disabled", false);
                 if (this.opts.shouldFocusInput(this)) {
                     this.focusser.focus();
                 }
@@ -2000,7 +2000,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         cancel: function () {
             this.parent.cancel.apply(this, arguments);
-            this.focusser.prop("disabled", false);
+            this.focusser.attr("disabled", false);
 
             if (this.opts.shouldFocusInput(this)) {
                 this.focusser.focus();
@@ -2066,7 +2066,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 .text($("label[for='" + this.focusser.attr('id') + "']").text())
                 .attr('for', this.search.attr('id'));
 
-            this.search.on("keydown", this.bind(function (e) {
+            this.search.bind("keydown", this.bind(function (e) {
                 if (!this.isInterfaceEnabled()) return;
 
                 if (e.which === KEY.PAGE_UP || e.which === KEY.PAGE_DOWN) {
@@ -2095,7 +2095,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }));
 
-            this.search.on("blur", this.bind(function(e) {
+            this.search.bind("blur", this.bind(function(e) {
                 // a workaround for chrome to keep the search field focussed when the scroll bar is used to scroll the dropdown.
                 // without this the search field loses focus which is annoying
                 if (document.activeElement === this.body.get(0)) {
@@ -2107,7 +2107,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }));
 
-            this.focusser.on("keydown", this.bind(function (e) {
+            this.focusser.bind("keydown", this.bind(function (e) {
                 if (!this.isInterfaceEnabled()) return;
 
                 if (e.which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e) || e.which === KEY.ESC) {
@@ -2140,7 +2140,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
 
             installKeyUpChangeEvent(this.focusser);
-            this.focusser.on("keyup-change input", this.bind(function(e) {
+            this.focusser.bind("keyup-change input", this.bind(function(e) {
                 if (this.opts.minimumResultsForSearch >= 0) {
                     e.stopPropagation();
                     if (this.opened()) return;
@@ -2148,7 +2148,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }));
 
-            selection.on("mousedown touchstart", "abbr", this.bind(function (e) {
+            selection.delegate("abbr", "mousedown touchstart", this.bind(function (e) {
                 if (!this.isInterfaceEnabled()) return;
                 this.clear();
                 killEventImmediately(e);
@@ -2156,7 +2156,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.selection.focus();
             }));
 
-            selection.on("mousedown touchstart", this.bind(function (e) {
+            selection.bind("mousedown touchstart", this.bind(function (e) {
                 // Prevent IE from generating a click event on the body
                 reinsertElement(selection);
 
@@ -2173,28 +2173,28 @@ the specific language governing permissions and limitations under the Apache Lic
                 killEvent(e);
             }));
 
-            dropdown.on("mousedown touchstart", this.bind(function() {
+            dropdown.bind("mousedown touchstart", this.bind(function() {
                 if (this.opts.shouldFocusInput(this)) {
                     this.search.focus();
                 }
             }));
 
-            selection.on("focus", this.bind(function(e) {
+            selection.bind("focus", this.bind(function(e) {
                 killEvent(e);
             }));
 
-            this.focusser.on("focus", this.bind(function(){
+            this.focusser.bind("focus", this.bind(function(){
                 if (!this.container.hasClass("select2-container-active")) {
                     this.opts.element.trigger($.Event("select2-focus"));
                 }
                 this.container.addClass("select2-container-active");
-            })).on("blur", this.bind(function() {
+            })).bind("blur", this.bind(function() {
                 if (!this.opened()) {
                     this.container.removeClass("select2-container-active");
                     this.opts.element.trigger($.Event("select2-blur"));
                 }
             }));
-            this.search.on("focus", this.bind(function(){
+            this.search.bind("focus", this.bind(function(){
                 if (!this.container.hasClass("select2-container-active")) {
                     this.opts.element.trigger($.Event("select2-focus"));
                 }
@@ -2255,7 +2255,7 @@ the specific language governing permissions and limitations under the Apache Lic
         isPlaceholderOptionSelected: function() {
             var placeholderOption;
             if (this.getPlaceholder() === undefined) return false; // no placeholder specified so no option should be considered
-            return ((placeholderOption = this.getPlaceholderOption()) !== undefined && placeholderOption.prop("selected"))
+            return ((placeholderOption = this.getPlaceholderOption()) !== undefined && placeholderOption.attr("selected"))
                 || (this.opts.element.val() === "")
                 || (this.opts.element.val() === undefined)
                 || (this.opts.element.val() === null);
@@ -2623,7 +2623,7 @@ the specific language governing permissions and limitations under the Apache Lic
             this.selection = selection = this.container.find(selector);
 
             var _this = this;
-            this.selection.on("click", ".select2-search-choice:not(.select2-locked)", function (e) {
+            this.selection.bind("click", ".select2-search-choice:not(.select2-locked)", function (e) {
                 //killEvent(e);
                 _this.search[0].focus();
                 _this.selectChoice($(this));
@@ -2636,7 +2636,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 .text($("label[for='" + this.opts.element.attr("id") + "']").text())
                 .attr('for', this.search.attr('id'));
 
-            this.search.on("input paste", this.bind(function() {
+            this.search.bind("input paste", this.bind(function() {
                 if (!this.isInterfaceEnabled()) return;
                 if (!this.opened()) {
                     this.open();
@@ -2646,7 +2646,7 @@ the specific language governing permissions and limitations under the Apache Lic
             this.search.attr("tabindex", this.elementTabIndex);
 
             this.keydowns = 0;
-            this.search.on("keydown", this.bind(function (e) {
+            this.search.bind("keydown", this.bind(function (e) {
                 if (!this.isInterfaceEnabled()) return;
 
                 ++this.keydowns;
@@ -2743,13 +2743,13 @@ the specific language governing permissions and limitations under the Apache Lic
 
             }));
 
-            this.search.on("keyup", this.bind(function (e) {
+            this.search.bind("keyup", this.bind(function (e) {
                 this.keydowns = 0;
                 this.resizeSearch();
             })
             );
 
-            this.search.on("blur", this.bind(function(e) {
+            this.search.bind("blur", this.bind(function(e) {
                 this.container.removeClass("select2-container-active");
                 this.search.removeClass("select2-focused");
                 this.selectChoice(null);
@@ -2758,7 +2758,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.opts.element.trigger($.Event("select2-blur"));
             }));
 
-            this.container.on("click", selector, this.bind(function (e) {
+            this.container.bind("click", selector, this.bind(function (e) {
                 if (!this.isInterfaceEnabled()) return;
                 if ($(e.target).closest(".select2-search-choice").length > 0) {
                     // clicked inside a select2 search choice, do not open
@@ -2774,7 +2774,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 e.preventDefault();
             }));
 
-            this.container.on("focus", selector, this.bind(function () {
+            this.container.bind("focus", selector, this.bind(function () {
                 if (!this.isInterfaceEnabled()) return;
                 if (!this.container.hasClass("select2-container-active")) {
                     this.opts.element.trigger($.Event("select2-focus"));
@@ -2794,7 +2794,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // multi
         enableInterface: function() {
             if (this.parent.enableInterface.apply(this, arguments)) {
-                this.search.prop("disabled", !this.isInterfaceEnabled());
+                this.search.attr("disabled", !this.isInterfaceEnabled());
             }
         },
 
@@ -3003,8 +3003,8 @@ the specific language governing permissions and limitations under the Apache Lic
 
             if(enableChoice){
               choice.find(".select2-search-choice-close")
-                  .on("mousedown", killEvent)
-                  .on("click dblclick", this.bind(function (e) {
+                  .bind("mousedown", killEvent)
+                  .bind("click dblclick", this.bind(function (e) {
                   if (!this.isInterfaceEnabled()) return;
 
                   this.unselect($(e.target));
@@ -3012,7 +3012,7 @@ the specific language governing permissions and limitations under the Apache Lic
                   killEvent(e);
                   this.close();
                   this.focusSearch();
-              })).on("focus", this.bind(function () {
+              })).bind("focus", this.bind(function () {
                   if (!this.isInterfaceEnabled()) return;
                   this.container.addClass("select2-container-active");
                   this.dropdown.addClass("select2-drop-active");
@@ -3310,7 +3310,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 opts.element = $(this);
 
                 if (opts.element.get(0).tagName.toLowerCase() === "select") {
-                    multiple = opts.element.prop("multiple");
+                    multiple = opts.element.attr("multiple");
                 } else {
                     multiple = opts.multiple || false;
                     if ("tags" in opts) {opts.multiple = multiple = true;}
